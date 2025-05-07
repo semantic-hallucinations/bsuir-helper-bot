@@ -1,39 +1,37 @@
-import asyncio
-import random
+import os
 
-import aiohttp
+import httpx
 from environs import Env
+
+from config import setup_services_logging
 
 env = Env()
 env.read_env()
 
-API_URL = env.str("API_URL")
+logger = setup_services_logging()
 
 
 class ApiService:
-    async def __get_cat_image_url(self) -> str:
+    RAG_AGENT_API_URL = env.str("RAG_AGENT_API_URL")
+
+    @classmethod
+    async def get_response(cls, query: str) -> str:
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(API_URL) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        return data[0]["url"]
-                    else:
-                        return "https://http.cat/404"
-        except Exception as e:
-            print(f"Ошибка при получении картинки: {e}")
-            return "https://http.cat/500"
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                response = await client.post(
+                    cls.RAG_AGENT_API_URL, json={"message": query}, stream=True
+                )
+                response.raise_for_status()
 
-    async def get_response(self, query: str):
-        await asyncio.sleep(random.uniform(0.5, 2.0))
-
-        responses = [
-            "Это тестовый ответ от RAG-системы.",
-            "Ассистент сейчас занят, попробуйте повторить запрос позже",
-        ]
-
-        if random.random() < 0.3:
-            image_url = await self.__get_cat_image_url()
-            return f"Ассистент недоступен сейчас. Посмотрите на картинку кота:\n{image_url}"
-        else:
-            return random.choice(responses)
+                full_text = ""
+                async for chunk in response.aiter_text():
+                    full_text += chunk
+                return full_text
+        except httpx.HTTPStatusError as e:
+            logger.error(f"API error: {e.response.status_code} - {e.response.text}")
+            raise RuntimeError(
+                f"API error: {e.response.status_code} - {e.response.text}"
+            ) from e
+        except httpx.RequestError as e:
+            logger.error("Error while connecting to RAG-service")
+            raise RuntimeError("Error while connecting to RAG-service") from e

@@ -2,13 +2,8 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 
-from environs import Env
-
 LOGS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "logs")
 os.makedirs(LOGS_DIR, exist_ok=True)
-
-env = Env()
-env.read_env()
 
 
 def setup_logger(name, log_file, console_level=logging.INFO, file_level=logging.DEBUG):
@@ -48,8 +43,12 @@ def setup_bot_logging():
 
 
 def setup_aiogram_logging():
-    log_level = env.log_level("AIOGRAM_LOGGER_LEVEL", "WARNING")
-    setup_logger("aiogram", "aiogram.log", log_level, log_level)
+    setup_logger(
+        "aiogram",
+        "aiogram.log",
+        console_level=logging.WARNING,
+        file_level=logging.WARNING,
+    )
 
 
 def setup_handlers_logging():

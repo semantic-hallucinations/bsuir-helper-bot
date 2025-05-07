@@ -3,7 +3,7 @@ import asyncio
 from aiogram import Bot, Dispatcher
 
 from config import Config, load_config, setup_aiogram_logging, setup_bot_logging
-from handlers import commands_router, default_router
+from handlers import commands_router, usr_msg_router
 
 setup_aiogram_logging()
 logger = setup_bot_logging()
@@ -18,7 +18,7 @@ async def main() -> None:
     # bot initialization
     bot = Bot(token=config.tg_Bot.token)
     dp = Dispatcher()
-    dp.include_routers(commands_router, default_router)
+    dp.include_routers(commands_router, usr_msg_router)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)

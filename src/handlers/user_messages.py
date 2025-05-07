@@ -2,27 +2,24 @@ from aiogram import F, Router
 from aiogram.types import Message
 
 from services.api_service import ApiService
-
+from config import setup_handlers_logging
 # Инициализация сервиса
 api_service = ApiService()
 
-default_router = Router()
+usr_msg_router = Router()
+logger = setup_handlers_logging()
 
-
-@default_router.message(F.text)
+@usr_msg_router.message(F.text)
 async def process_text_message(message: Message):
-    model_answer = await api_service.get_response(message.text)
-
-    if model_answer.startswith(
-        "Ассистент недоступен сейчас. Посмотрите на картинку кота:"
-    ):
-        image_url = model_answer.split("\n")[-1]
-        await message.answer_photo(caption=model_answer.split("\n")[0], photo=image_url)
-    else:
-        await message.answer(text=model_answer)
+    try:
+        response = await ApiService.get_response(message.text)
+        await message.answer(response)
+    except RuntimeError as e:
+        await message.answer("Извините, сервис временно недоступен. Попробуйте позже.")
+        logger.error(f"Handling responce error: {e}")
 
 
-@default_router.message()
+@usr_msg_router.message()
 async def process_non_text_message(message: Message):
     await message.answer(
         text="На данный момент бот не работает только с текстовыми запросами."
