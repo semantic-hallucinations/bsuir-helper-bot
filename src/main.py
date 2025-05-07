@@ -1,29 +1,17 @@
-import asyncio
-import logging
+from fastapi import FastAPI, Header
+from pydantic import BaseModel
 
-from aiogram import Bot, Dispatcher
+app = FastAPI()
 
-from config import load_config, Config
-from config import setup_bot_logging, setup_aiogram_logging
-from handlers import commands_router, default_router
 
-setup_aiogram_logging()
-logger = setup_bot_logging()
+class TextRequest(BaseModel):
+    text: str
 
-async def main() -> None:
-    # Выводим в консоль информацию о начале запуска бота
-    logger.info('Starting bot')
-    #set bot configuration
-    config : Config = load_config()
 
-    #bot initialization
-    bot = Bot(
-        token=config.tg_Bot.token
-    )
-    dp = Dispatcher()
-    dp.include_routers(commands_router, default_router) 
-
-    await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
-
-asyncio.run(main())
+@app.post("/length/")
+async def calculate_length(
+    request: TextRequest, x_multiplier: int = Header(1, alias="multiplier")
+):
+    length = len(request.text)
+    result = length * x_multiplier
+    return {"length": length, "result": result}
