@@ -1,9 +1,7 @@
-from aiogram import Router
+from aiogram import F, Router
 from aiogram.types import Message
+
 from services.api_service import ApiService
-import io
-from aiogram.types import BufferedInputFile
-from aiogram import F
 
 # Инициализация сервиса
 api_service = ApiService()
@@ -11,20 +9,25 @@ api_service = ApiService()
 default_router = Router()
 
 
-@default_router.message()
-async def process_message(message: Message):
+@default_router.message(F.text)
+async def process_text_message(message: Message):
     model_answer = await api_service.get_response(message.text)
 
-    if model_answer.startswith("Ассистент недоступен сейчас. Посмотрите на картинку кота:"):
-        image_url = model_answer.split("\n")[-1]  
-        await message.answer_photo(
-            caption=model_answer.split("\n")[0],
-            photo=image_url
-        )
+    if model_answer.startswith(
+        "Ассистент недоступен сейчас. Посмотрите на картинку кота:"
+    ):
+        image_url = model_answer.split("\n")[-1]
+        await message.answer_photo(caption=model_answer.split("\n")[0], photo=image_url)
     else:
-        await message.answer(
-            text=model_answer
-        )
+        await message.answer(text=model_answer)
+
+
+@default_router.message()
+async def process_non_text_message(message: Message):
+    await message.answer(
+        text="На данный момент бот не работает только с текстовыми запросами."
+    )
+
 
 # @default_router.message(F.text.lower().contains("грузин"))
 # async def process_message(message: Message):
