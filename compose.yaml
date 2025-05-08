@@ -4,6 +4,6 @@ services:
     ports:
       - "8080:8000"
     volumes:
-      - ./logs:/app/logs 
+      - ./logs:/app/logs
     env_file:
       - .env
