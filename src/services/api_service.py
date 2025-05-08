@@ -20,7 +20,7 @@ class ApiService:
                     cls.RAG_AGENT_API_URL, json={"message": query}
                 )
                 response.raise_for_status()
-                return response.json() 
+                return response.json()
         except httpx.HTTPStatusError as e:
             logger.error(f"API error: {e.response.status_code} - {e.response.text}")
             raise RuntimeError(
