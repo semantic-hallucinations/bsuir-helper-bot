@@ -1,6 +1,10 @@
 services:
-  microservice-template:
+  bsuir-helper-bot:
     build: .
     ports:
-      # You can take any port you like instead of 8080 in your network
       - "8080:8000"
+    volumes:
+      - ./logs:/app/logs  # сохраняем логи на хосте
+    env_file:
+      - .env
+
