@@ -17,7 +17,7 @@ class ApiService:
         try:
             async with httpx.AsyncClient(timeout=60.0) as client:
                 response = await client.post(
-                    cls.RAG_AGENT_API_URL, json={"message": query}
+                    cls.RAG_AGENT_API_URL, data=query
                 )
                 response.raise_for_status()
                 return response.json()
