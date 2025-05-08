@@ -8,7 +8,12 @@ os.makedirs(LOGS_DIR, exist_ok=True)
 
 def setup_logger(name, log_file, console_level=logging.INFO, file_level=logging.DEBUG):
     logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)  # Устанавливаем минимальный уровень
+    logger.setLevel(logging.DEBUG)
+
+    if logger.handlers:
+        return logger
+
+    logger.propagate = False
 
     formatter = logging.Formatter(
         (
@@ -52,8 +57,8 @@ def setup_aiogram_logging():
 
 
 def setup_handlers_logging():
-    return setup_logger("bot.handlers", "handlers.log", console_level=logging.WARNING)
+    return setup_logger("bot.handlers", "handlers.log")
 
 
 def setup_services_logging():
-    return setup_logger("bot.services", "services.log", console_level=logging.WARNING)
+    return setup_logger("bot.services", "services.log")

@@ -1,5 +1,3 @@
-import os
-
 import httpx
 from environs import Env
 
@@ -18,15 +16,15 @@ class ApiService:
     async def get_response(cls, query: str) -> str:
         try:
             async with httpx.AsyncClient(timeout=60.0) as client:
-                response = await client.post(
-                    cls.RAG_AGENT_API_URL, json={"message": query}, stream=True
-                )
-                response.raise_for_status()
+                async with client.stream(
+                    "POST", cls.RAG_AGENT_API_URL, json={"message": query}
+                ) as response:
+                    response.raise_for_status()
 
-                full_text = ""
-                async for chunk in response.aiter_text():
-                    full_text += chunk
-                return full_text
+                    full_text = ""
+                    async for chunk in response.aiter_text():
+                        full_text += chunk
+                    return full_text
         except httpx.HTTPStatusError as e:
             logger.error(f"API error: {e.response.status_code} - {e.response.text}")
             raise RuntimeError(

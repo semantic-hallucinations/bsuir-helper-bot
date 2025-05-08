@@ -2,10 +2,7 @@ from aiogram import Router
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
 
-from config import setup_handlers_logging
-
 commands_router = Router()
-logger = setup_handlers_logging()
 
 
 @commands_router.message(CommandStart())
