@@ -17,3 +17,8 @@ def load_config(path: str | None = None) -> Config:
     env = Env()
     env.read_env(path)
     return Config(tg_Bot=BsuirAssistantBot(token=env("BOT_TOKEN")))
+
+
+# constants related to bot
+
+BOT_USERNAME = "bsuir_assistant_bot"

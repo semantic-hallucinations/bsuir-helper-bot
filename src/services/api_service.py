@@ -3,14 +3,14 @@ import json
 import httpx
 from environs import Env
 
-from config import setup_services_logging
+from config import get_logger
 
 from .message_formatter import format_rag_agent_response
 
 env = Env()
 env.read_env()
 
-logger = setup_services_logging()
+logger = get_logger("bot.services")
 
 
 class ApiService:

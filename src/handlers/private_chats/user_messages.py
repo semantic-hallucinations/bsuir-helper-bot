@@ -5,14 +5,14 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import Message
 
-from config import setup_handlers_logging
+from config import get_logger
 from services.api_service import ApiService
 
 from .fsm_states import ProcessReqest
 
 usr_msg_router = Router()
 usr_msg_router.message.filter(F.chat.type == ChatType.PRIVATE)
-logger = setup_handlers_logging()
+logger = get_logger("bot.handlers")
 
 
 @usr_msg_router.message(F.text, StateFilter(default_state))
@@ -23,7 +23,7 @@ async def process_text_message(message: Message, state: FSMContext):
         await message.answer(response)
         logger.info(f"Successfuly handling user {message.from_user.id} request")
     except RuntimeError as e:
-        await message.answer("Извините, сервис временно недоступен. Попробуйте позже.")
+        await message.answer("Извините, бот временно недоступен. Попробуйте позже.")
         logger.error(f"Handling responce error: {e}")
     finally:
         await state.clear()

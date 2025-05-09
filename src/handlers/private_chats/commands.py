@@ -3,8 +3,11 @@ from aiogram.enums import ChatType
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
 
+from config import get_logger
+
 commands_router = Router()
 commands_router.message.filter(F.chat.type == ChatType.PRIVATE)
+logger = get_logger("bot.handlers")
 
 
 @commands_router.message(CommandStart())

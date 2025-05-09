@@ -5,20 +5,18 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from config import Config, load_config, setup_aiogram_logging, setup_bot_logging
-from handlers import commands_router, usr_msg_router
+from config import Config, get_logger, init_logging, load_config
+from handlers import commands_router, grp_msg_router, usr_msg_router
 
-setup_aiogram_logging()
-logger = setup_bot_logging()
+init_logging()
+logger = get_logger("bot")
 
 
+# TODO: зарегать хендлер для групповых сообщений
 async def main() -> None:
-    # Выводим в консоль информацию о начале запуска бота
     logger.info("Starting bot")
-    # set bot configuration
     config: Config = load_config()
 
-    # bot initialization
     bot = Bot(
         token=config.tg_Bot.token,
         default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN),
@@ -26,7 +24,7 @@ async def main() -> None:
 
     mem_storage = MemoryStorage()
     dp = Dispatcher(storage=mem_storage)
-    dp.include_routers(commands_router, usr_msg_router)
+    dp.include_routers(commands_router, usr_msg_router, grp_msg_router)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
