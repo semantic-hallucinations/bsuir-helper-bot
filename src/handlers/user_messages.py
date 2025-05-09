@@ -11,7 +11,7 @@ logger = setup_handlers_logging()
 @usr_msg_router.message(F.text)
 async def process_text_message(message: Message):
     try:
-        response = await ApiService.get_response(message.text)
+        response: str = await ApiService.get_response(message.text)
         await message.answer(response.get("response"))
         logger.info("Successfuly handling user request")
     except RuntimeError as e:

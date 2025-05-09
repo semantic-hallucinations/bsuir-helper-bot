@@ -1,4 +1,5 @@
 import json
+import re
 
 import httpx
 from environs import Env
@@ -24,7 +25,8 @@ class ApiService:
                     headers={"Content-Type": "application/json"},
                 )
                 response.raise_for_status()
-                return response.json()
+                formatted_response = ApiService.__format_response(response.json())
+                return formatted_response
         except httpx.HTTPStatusError as e:
             logger.error(f"API error: {e.response.status_code} - {e.response.text}")
             raise RuntimeError(
@@ -33,3 +35,18 @@ class ApiService:
         except httpx.RequestError as e:
             logger.error("Error while connecting to RAG-service")
             raise RuntimeError("Error while connecting to RAG-service") from e
+
+    @classmethod
+    def __format_response(cls, response) -> str:
+        response_text: str = response.get("response", "")
+        response_text = re.sub(r"(?m)^#{1,6}\s*", "", response_text)
+        # Берём список ссылок, или пустой список
+        sources = response.get("source_urls") or []
+
+        # Формируем блок источников, если они есть
+        if sources:
+            sources_block = "\n\nИсточники:\n" + "\n".join(sources)
+        else:
+            sources_block = ""
+
+        return response_text + sources_block
