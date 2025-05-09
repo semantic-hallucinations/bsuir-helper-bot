@@ -1,8 +1,8 @@
 import json
-import re
 
 import httpx
 from environs import Env
+from message_formatter import format_rag_agent_response
 
 from config import setup_services_logging
 
@@ -25,7 +25,7 @@ class ApiService:
                     headers={"Content-Type": "application/json"},
                 )
                 response.raise_for_status()
-                formatted_response = ApiService.__format_response(response.json())
+                formatted_response = format_rag_agent_response(response.json())
                 return formatted_response
         except httpx.HTTPStatusError as e:
             logger.error(f"API error: {e.response.status_code} - {e.response.text}")
@@ -35,17 +35,3 @@ class ApiService:
         except httpx.RequestError as e:
             logger.error("Error while connecting to RAG-service")
             raise RuntimeError("Error while connecting to RAG-service") from e
-
-    @classmethod
-    def __format_response(cls, response) -> str:
-        response_text: str = response.get("response", "")
-        response_text = re.sub(r"(?m)^#{1,6}\s*", "", response_text)
-
-        sources = response.get("source_urls") or []
-
-        if sources:
-            sources_block = "\n\nИсточники:\n" + "\n".join(sources)
-        else:
-            sources_block = ""
-
-        return response_text + sources_block
