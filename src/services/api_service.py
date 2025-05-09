@@ -40,10 +40,9 @@ class ApiService:
     def __format_response(cls, response) -> str:
         response_text: str = response.get("response", "")
         response_text = re.sub(r"(?m)^#{1,6}\s*", "", response_text)
-        # Берём список ссылок, или пустой список
+
         sources = response.get("source_urls") or []
 
-        # Формируем блок источников, если они есть
         if sources:
             sources_block = "\n\nИсточники:\n" + "\n".join(sources)
         else:
