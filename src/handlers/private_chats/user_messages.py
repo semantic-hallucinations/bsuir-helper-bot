@@ -1,4 +1,5 @@
 from aiogram import F, Router
+from aiogram.enums import ChatType
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
@@ -10,6 +11,7 @@ from services.api_service import ApiService
 from .fsm_states import ProcessReqest
 
 usr_msg_router = Router()
+usr_msg_router.message.filter(F.chat.type == ChatType.PRIVATE)
 logger = setup_handlers_logging()
 
 
