@@ -20,7 +20,7 @@ async def main() -> None:
     # bot initialization
     bot = Bot(
         token=config.tg_Bot.token,
-        default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN_V2),
+        default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN),
     )
     dp = Dispatcher()
     dp.include_routers(commands_router, usr_msg_router)
