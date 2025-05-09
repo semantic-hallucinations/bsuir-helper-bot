@@ -1,6 +1,7 @@
 import asyncio
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
 from config import Config, load_config, setup_aiogram_logging, setup_bot_logging
@@ -17,7 +18,10 @@ async def main() -> None:
     config: Config = load_config()
 
     # bot initialization
-    bot = Bot(token=config.tg_Bot.token, parse_mode=ParseMode.MARKDOWN_V2)
+    bot = Bot(
+        token=config.tg_Bot.token,
+        default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN_V2),
+    )
     dp = Dispatcher()
     dp.include_routers(commands_router, usr_msg_router)
 
