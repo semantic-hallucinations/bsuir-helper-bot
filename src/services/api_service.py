@@ -2,9 +2,10 @@ import json
 
 import httpx
 from environs import Env
-from message_formatter import format_rag_agent_response
 
 from config import setup_services_logging
+
+from .message_formatter import format_rag_agent_response
 
 env = Env()
 env.read_env()

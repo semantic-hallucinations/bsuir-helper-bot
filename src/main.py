@@ -3,6 +3,7 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.fsm.storage.memory import MemoryStorage
 
 from config import Config, load_config, setup_aiogram_logging, setup_bot_logging
 from handlers import commands_router, usr_msg_router
@@ -22,7 +23,9 @@ async def main() -> None:
         token=config.tg_Bot.token,
         default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN),
     )
-    dp = Dispatcher()
+
+    mem_storage = MemoryStorage()
+    dp = Dispatcher(storage=mem_storage)
     dp.include_routers(commands_router, usr_msg_router)
 
     await bot.delete_webhook(drop_pending_updates=True)
