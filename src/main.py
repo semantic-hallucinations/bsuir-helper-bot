@@ -12,7 +12,6 @@ init_logging()
 logger = get_logger("bot")
 
 
-# TODO: зарегать хендлер для групповых сообщений
 async def main() -> None:
     logger.info("Starting bot")
     config: Config = load_config()

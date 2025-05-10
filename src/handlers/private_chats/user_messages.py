@@ -15,6 +15,7 @@ usr_msg_router.message.filter(F.chat.type == ChatType.PRIVATE)
 logger = get_logger("bot.handlers")
 
 
+# TODO реализация через мидлвейр а не через состояния тк может не хватить времени ожидания
 @usr_msg_router.message(F.text, StateFilter(default_state))
 async def process_text_message(message: Message, state: FSMContext):
     await state.set_state(ProcessReqest.waiting)

@@ -2,10 +2,12 @@ from aiogram import F, Router
 from aiogram.types import Message
 
 from config import BOT_USERNAME, get_logger
+from middlewares import FloodRateLimiter
 from services.api_service import ApiService
 
 grp_msg_router = Router()
 grp_msg_router.message.filter(F.chat.type.in_({"group", "supergroup"}))
+grp_msg_router.message.middleware(FloodRateLimiter(BOT_USERNAME, 5))
 logger = get_logger("bot.handlers")
 
 
