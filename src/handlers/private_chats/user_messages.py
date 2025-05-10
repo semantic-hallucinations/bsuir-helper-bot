@@ -1,24 +1,19 @@
 from aiogram import F, Router
 from aiogram.enums import ChatType
-from aiogram.filters import StateFilter
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import default_state
 from aiogram.types import Message
 
 from config import get_logger
+from middlewares import PrivateChatMsgTrottler
 from services.api_service import ApiService
 
-from .fsm_states import ProcessReqest
-
 usr_msg_router = Router()
+usr_msg_router.message.middleware(PrivateChatMsgTrottler())
 usr_msg_router.message.filter(F.chat.type == ChatType.PRIVATE)
 logger = get_logger("bot.handlers")
 
 
-# TODO реализация через мидлвейр а не через состояния тк может не хватить времени ожидания
-@usr_msg_router.message(F.text, StateFilter(default_state))
-async def process_text_message(message: Message, state: FSMContext):
-    await state.set_state(ProcessReqest.waiting)
+@usr_msg_router.message(F.text)
+async def process_text_message(message: Message):
     try:
         response: str = await ApiService.get_response(message.text)
         await message.answer(response)
@@ -26,24 +21,6 @@ async def process_text_message(message: Message, state: FSMContext):
     except RuntimeError as e:
         await message.answer("Извините, бот временно недоступен. Попробуйте позже.")
         logger.error(f"Handling responce error: {e}")
-    finally:
-        await state.clear()
-
-
-@usr_msg_router.message(StateFilter(ProcessReqest.waiting))
-async def waiting_response_notify(message: Message, state: FSMContext):
-    logger.debug(
-        f"Waiting state while handling response user {message.from_user.id}'s request"
-    )
-    await message.reply(
-        "Пожалуйста, дождитесь завершения обработки предыдущего запроса."
-    )
-    await state.set_state(ProcessReqest.ignore)
-
-
-@usr_msg_router.message(StateFilter(ProcessReqest.ignore))
-async def ignore_while_processing(message: Message):
-    logger.debug(f"Ignore state while handling user {message.from_user.id}'s request")
 
 
 @usr_msg_router.message(~F.text)

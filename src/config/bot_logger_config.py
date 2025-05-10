@@ -5,7 +5,6 @@ from logging.handlers import RotatingFileHandler
 LOGS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "logs")
 os.makedirs(LOGS_DIR, exist_ok=True)
 
-
 _LOGGER_CONFIGS = {
     "bot": {
         "file": "bot.log",
@@ -58,7 +57,7 @@ def init_logging():
         # File handler
         file_handler = RotatingFileHandler(
             os.path.join(LOGS_DIR, config["file"]),
-            maxBytes=10 * 1024,
+            maxBytes=1024 * 1024,
             backupCount=5,
             encoding="utf-8",
         )

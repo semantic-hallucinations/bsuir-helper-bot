@@ -1,3 +1,4 @@
-from .FloodRateLimiter import FloodRateLimiter
+from .GroupChatMsgTrottler import GroupChatMsgTrottler
+from .PrivateChatMsgTrottler import PrivateChatMsgTrottler
 
-__all__ = ["FloodRateLimiter"]
+__all__ = ["PrivateChatMsgTrottler", "GroupChatMsgTrottler"]
