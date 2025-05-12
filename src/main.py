@@ -1,8 +1,9 @@
 import asyncio
 
 from aiogram import Bot, Dispatcher
-from aiogram.client.default import DefaultBotProperties
-from aiogram.enums import ParseMode
+
+# from aiogram.client.default import DefaultBotProperties
+# from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from config import Config, get_logger, init_logging, load_config
@@ -18,7 +19,7 @@ async def main() -> None:
 
     bot = Bot(
         token=config.tg_Bot.token,
-        default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN),
+        # default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN),
     )
 
     mem_storage = MemoryStorage()
