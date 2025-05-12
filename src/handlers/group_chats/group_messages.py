@@ -12,9 +12,31 @@ grp_msg_router.message.middleware(GroupChatMsgTrottler())
 logger = get_logger("bot.handlers")
 
 
+@grp_msg_router.message(F.reply_to_message, F.text)
+async def process_text_reply_message(message: Message):
+    if message.text.startswith(f"@{BOT_USERNAME}"):
+        logger.debug("REPLY HANDLER GROUP CHAT")
+        query = (
+            message.text.split(maxsplit=1)[1] if len(message.text.split()) > 1 else ""
+        )
+        if not query:
+            await message.reply("Чтобы задать вопрос, напишите его после тега бота.")
+            return
+        try:
+            replied_text = message.reply_to_message.text
+            query = replied_text + " " + query
+            response = await ApiService.get_response(query)
+            await message.reply(response)
+            logger.info(f"Successfuly handling user {message.from_user.id} request")
+        except RuntimeError as e:
+            await message.reply("Извините, бот временно недоступен. Попробуйте позже.")
+            logger.error(f"Handling responce error: {e}")
+
+
 @grp_msg_router.message(F.text)
 async def process_text_message(message: Message):
     if message.text.startswith(f"@{BOT_USERNAME}"):
+        logger.debug("ANSWER HANDLER GROUP CHAT")
         query = (
             message.text.split(maxsplit=1)[1] if len(message.text.split()) > 1 else ""
         )

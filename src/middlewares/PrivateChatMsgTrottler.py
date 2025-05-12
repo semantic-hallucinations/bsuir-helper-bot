@@ -21,13 +21,11 @@ class PrivateChatMsgTrottler(BaseMiddleware):
         event: Message,
         data: Dict[str, Any],
     ) -> Any:
-        logger.warning("IN PRIVATE MIDDLEWARE")
+
         if event.chat.type != ChatType.PRIVATE:
-            logger.warning("NOT PRIVATE CHAT")
             return await handler(event, data)
 
         user_id = event.from_user.id
-        logger.warning("BOT ANSWER IN PRIVATE CHAT")
         if self.busy_users[user_id]:
             if not self.warned_users[user_id]:
                 self.warned_users[user_id] = True
