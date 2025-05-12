@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 import httpx
@@ -15,24 +16,23 @@ logger = get_logger("bot.services")
 
 class ApiService:
     RAG_AGENT_API_URL = env.str("RAG_AGENT_API_URL")
+    MAX_RETRIES = 3
 
     @classmethod
     async def get_response(cls, query: str) -> dict:
-        try:
-            async with httpx.AsyncClient(timeout=60.0) as client:
-                response = await client.post(
-                    cls.RAG_AGENT_API_URL,
-                    content=json.dumps(query),
-                    headers={"Content-Type": "application/json"},
-                )
-                response.raise_for_status()
-                formatted_response = format_rag_agent_response(response.json())
-                return formatted_response
-        except httpx.HTTPStatusError as e:
-            logger.error(f"API error: {e.response.status_code} - {e.response.text}")
-            raise RuntimeError(
-                f"API error: {e.response.status_code} - {e.response.text}"
-            ) from e
-        except httpx.RequestError as e:
-            logger.error("Error while connecting to RAG-service")
-            raise RuntimeError("Error while connecting to RAG-service") from e
+        for attempt in range(cls.MAX_RETRIES):
+            try:
+                async with httpx.AsyncClient(timeout=60.0) as client:
+                    response = await client.post(
+                        cls.RAG_AGENT_API_URL,
+                        content=json.dumps(query),
+                        headers={"Content-Type": "application/json"},
+                    )
+                    response.raise_for_status()
+                    return format_rag_agent_response(response.json())
+            except (httpx.RequestError, httpx.HTTPStatusError) as e:
+                logger.warning(f"Attempt {attempt + 1} failed: {str(e)}")
+                if attempt == cls.MAX_RETRIES - 1:
+                    logger.error("All retry attempts failed")
+                    raise RuntimeError("Failed to get response from RAG-service") from e
+                await asyncio.sleep(2**attempt)
