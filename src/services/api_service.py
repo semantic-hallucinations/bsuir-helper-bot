@@ -22,7 +22,7 @@ class ApiService:
     async def get_response(cls, query: str) -> dict:
         for attempt in range(cls.MAX_RETRIES):
             try:
-                async with httpx.AsyncClient(timeout=60.0) as client:
+                async with httpx.AsyncClient(timeout=120.0) as client:
                     response = await client.post(
                         cls.RAG_AGENT_API_URL,
                         content=json.dumps(query),
@@ -35,4 +35,4 @@ class ApiService:
                 if attempt == cls.MAX_RETRIES - 1:
                     logger.error("All retry attempts failed")
                     raise RuntimeError("Failed to get response from RAG-service") from e
-                await asyncio.sleep(2**attempt)
+                await asyncio.sleep(2**attempt * 3)
