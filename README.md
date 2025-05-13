@@ -5,8 +5,8 @@ Telegram-bot project
 - **conig** dir contains logger configuration and bot's config
 - **handlers** contains handlers for group and private chats. Also private chats supports bot commands
 - **services** implements communication with [answer-pipeline](https://github.com/semantic-hallucinations/answer_pipeline) service
-- **middlewares** flood filters for different chat types
- 
+- **middlewares** containes flood filters for different chat types
+
 ## Basic usage
 
 Chat with @BotFather in Telegram messenger to create a chat with bot.
