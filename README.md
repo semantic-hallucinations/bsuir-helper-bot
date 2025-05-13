@@ -1,26 +1,20 @@
-# microservice-template
-Template repository for microservice creation
+# BSUIR assistant telegram bot
+Telegram-bot project
 
 ## Structure:
-- pre-commit config
-- ci config
-- cd config
-- basic service
-
+- **conig** dir contains logger configuration and bot's config
+- **handlers** contains handlers for group and private chats. Also private chats supports bot commands
+- **services** implements communication with [answer-pipeline](https://github.com/semantic-hallucinations/answer_pipeline) service
+- **middlewares** flood filters for different chat types
+ 
 ## Basic usage
 
-CI runs on every push/pull to main branch, to check your changes llocally use pre-commit
-CD runs if CI on main branch finishes succesfully(for organisation)
+Chat with @BotFather in Telegram messenger to create a chat with bot.
 
-## Pre-commit
+Also, to use bot in group chats, set enable groups and disable privacy mod in @BotFather
 
-### To run pre-commit locally for ci checkouts:
-1. ```pip install pre-commit```
-2. ```pre-commit install```
-3. ```pre-commit run -a```
+Check .env.example to init eviroment variable correctly
 
-### !!!Warning!!!
-Pre-commit runs only on files that added to git by ```git add```
 
 ## Local running
 ```docker compose up --build``` and run example.py
