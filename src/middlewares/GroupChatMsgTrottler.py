@@ -21,6 +21,7 @@ class GroupChatMsgTrottler(BaseMiddleware):
         event: Message,
         data: Dict[str, Any],
     ) -> Any:
+        logger.info("IN GROUP MSG MIDDLEWARE")
         if event.chat.type not in [ChatType.GROUP, ChatType.SUPERGROUP]:
             return await handler(event, data)
 
@@ -29,6 +30,7 @@ class GroupChatMsgTrottler(BaseMiddleware):
         bot_mentioned = event.text and BOT_USERNAME in event.text
 
         if not bot_mentioned:
+            logger.info("BOT NOT MENTIONED")
             return
         if self.busy_users[user_id]:
             if not self.warned_users[user_id]:
@@ -38,6 +40,7 @@ class GroupChatMsgTrottler(BaseMiddleware):
                 )
             return
         else:
+            logger.info("BOT MENTIONED AND NUST ANSWER")
             self.busy_users[user_id] = True
             self.warned_users[user_id] = False
             try:

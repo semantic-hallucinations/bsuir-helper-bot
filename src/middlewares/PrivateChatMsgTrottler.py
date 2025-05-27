@@ -21,8 +21,9 @@ class PrivateChatMsgTrottler(BaseMiddleware):
         event: Message,
         data: Dict[str, Any],
     ) -> Any:
-
+        logger.info("IN PRIVATE CHAT MIDDLEWARE")
         if event.chat.type != ChatType.PRIVATE:
+            logger.info("SEND MSG TO HANDLERS")
             return await handler(event, data)
 
         user_id = event.from_user.id

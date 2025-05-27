@@ -1,5 +1,6 @@
 from aiogram import F, Router
-from aiogram.enums import ChatType
+from aiogram.enums import ChatType, ParseMode
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import Message
 
 from config import BOT_USERNAME, get_logger
@@ -26,7 +27,15 @@ async def process_text_reply_message(message: Message):
             replied_text = message.reply_to_message.text
             query = replied_text + " " + query
             response = await ApiService.get_response(query)
-            await message.reply(response)
+
+            try:
+                await message.answer(response, parse_mode=ParseMode.MARKDOWN_V2)
+            except TelegramBadRequest as e:
+                logger.error("Parsemode error for response: " + response)
+                logger.error(e.message)
+                await message.answer(response)
+                return
+
             logger.info(f"Successfuly handling user {message.from_user.id} request")
         except RuntimeError as e:
             await message.reply("Извините, бот временно недоступен. Попробуйте позже.")
@@ -45,7 +54,13 @@ async def process_text_message(message: Message):
             return
         try:
             response = await ApiService.get_response(query)
-            await message.reply(response)
+            try:
+                await message.answer(response, parse_mode=ParseMode.MARKDOWN_V2)
+            except TelegramBadRequest as e:
+                logger.error("Parsemode error for response: " + response)
+                logger.error(e.message)
+                await message.answer(response)
+                return
             logger.info(f"Successfuly handling user {message.from_user.id} request")
         except RuntimeError as e:
             await message.reply("Извините, бот временно недоступен. Попробуйте позже.")

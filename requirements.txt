@@ -17,6 +17,7 @@ httpx==0.28.1
 idna==3.10
 magic-filter==1.0.12
 marshmallow==3.26.1
+mdurl==0.1.2
 multidict==6.3.2
 packaging==24.2
 propcache==0.3.1

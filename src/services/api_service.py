@@ -19,7 +19,7 @@ class ApiService:
     MAX_RETRIES = 3
 
     @classmethod
-    async def get_response(cls, query: str) -> dict:
+    async def get_response(cls, query: str) -> str:
         for attempt in range(cls.MAX_RETRIES):
             try:
                 async with httpx.AsyncClient(timeout=120.0) as client:
