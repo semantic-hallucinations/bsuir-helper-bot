@@ -6,6 +6,7 @@ from aiogram.types import Message
 from config import get_logger
 from middlewares import PrivateChatMsgTrottler
 from services.api_service import ApiService
+from services.message_formatter import preclean_for_md2, strip_markdown
 
 usr_msg_router = Router()
 usr_msg_router.message.middleware(PrivateChatMsgTrottler())
@@ -22,11 +23,11 @@ async def process_text_reply_message(message: Message):
         response: str = await ApiService.get_response(query)
 
         try:
-            await message.answer(response, parse_mode=ParseMode.MARKDOWN_V2)
+            await message.answer(response, parse_mode=ParseMode.MARKDOWN)
         except TelegramBadRequest as e:
             logger.error("Parsemode error for response: " + response)
             logger.error(e.message)
-            await message.answer(response)
+            await message.answer(strip_markdown(response))
             return
 
         logger.info(f"Successfuly handling user {message.from_user.id} request")
@@ -42,11 +43,13 @@ async def process_text_message(message: Message):
         response: str = await ApiService.get_response(message.text)
 
         try:
-            await message.answer(response, parse_mode=ParseMode.MARKDOWN_V2)
+            await message.answer(
+                preclean_for_md2(response), parse_mode=ParseMode.MARKDOWN
+            )
         except TelegramBadRequest as e:
             logger.error("Parsemode error for response: " + response)
             logger.error(e.message)
-            await message.answer(response)
+            await message.answer(strip_markdown(response))
             return
 
         logger.info(f"Successfuly handling user {message.from_user.id} request")
